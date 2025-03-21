@@ -5,3 +5,10 @@
 
 ## Download San Francisco Car Class Detection Bounding Box Exmaple Zip File Image
 [example.png.zip](https://github.com/user-attachments/files/19377235/example.png.zip)
+
+
+## Create tf records
+
+```bash
+python convert.py -p /home/workspace/training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.
+```
