@@ -2,7 +2,7 @@ import copy
 import json
 import random
 
-import numpy as np 
+import numpy as np
 from PIL import Image
 
 from utils import check_results, display_results
@@ -10,7 +10,7 @@ from utils import check_results, display_results
 
 def calculate_iou(gt_bbox, pred_bbox):
     """
-    calculate iou 
+    calculate iou
     args:
     - gt_bbox [array]: 1x4 single gt bbox
     - pred_bbox [array]: 1x4 single pred bbox
@@ -21,11 +21,11 @@ def calculate_iou(gt_bbox, pred_bbox):
     ymin = np.max([gt_bbox[1], pred_bbox[1]])
     xmax = np.min([gt_bbox[2], pred_bbox[2]])
     ymax = np.min([gt_bbox[3], pred_bbox[3]])
-    
+
     intersection = max(0, xmax - xmin + 1) * max(0, ymax - ymin + 1)
     gt_area = (gt_bbox[2] - gt_bbox[0]) * (gt_bbox[3] - gt_bbox[1])
     pred_area = (pred_bbox[2] - pred_bbox[0]) * (pred_bbox[3] - pred_bbox[1])
-    
+
     union = gt_area + pred_area - intersection
     return intersection / union, [xmin, ymin, xmax, ymax]
 
@@ -43,7 +43,7 @@ def hflip(img, bboxes):
     # flip image
     flipped_img = img.transpose(Image.FLIP_LEFT_RIGHT)
     w, h = img.size
-    
+
     # flip bboxes
     bboxes = np.array(bboxes)
     flipped_bboxes = copy.copy(bboxes)
@@ -68,7 +68,7 @@ def resize(img, boxes, size):
     w, h = img.size
     ratiow = size[0] / w
     ratioh = size[1] / h
-    
+
     # resize bboxes
     boxes = np.array(boxes)
     resized_boxes = copy.copy(boxes)
@@ -99,7 +99,7 @@ def random_crop(img, boxes, classes, crop_size, min_area=100):
     y2 = y1 + crop_size[1]
 
     # crop the image
-    cropped_image = img.crop((x1, y1, x2 ,y2))
+    cropped_image = img.crop((x1, y1, x2, y2))
 
     # calculate iou between boxes and crop
     cropped_boxes = []
@@ -121,31 +121,38 @@ def random_crop(img, boxes, classes, crop_size, min_area=100):
     return cropped_image, cropped_boxes, cropped_classes
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # fix seed to check results
     np.random.seed(48)
 
-    # open annotations 
-    with open('data/ground_truth.json') as f:
+    # open annotations
+    with open("data/ground_truth.json") as f:
         ground_truth = json.load(f)
 
     # filter annotations and open image
-    filename = 'segment-1231623110026745648_480_000_500_000_with_camera_labels_38.png'
-    gt_boxes = [g['boxes'] for g in ground_truth if g['filename'] == filename][0]
-    gt_classes = [g['classes'] for g in ground_truth if g['filename'] == filename][0]
-    img = Image.open(f'data/images/{filename}')
+    filename = "segment-1231623110026745648_480_000_500_000_with_camera_labels_38.png"
+    gt_boxes = [g["boxes"] for g in ground_truth if g["filename"] == filename][0]
+    gt_classes = [g["classes"] for g in ground_truth if g["filename"] == filename][0]
+    img = Image.open(f"data/images/{filename}")
 
     # check horizontal flip
     flipped_img, flipped_bboxes = hflip(img, gt_boxes)
     display_results(img, gt_boxes, flipped_img, flipped_bboxes)
-    check_results(flipped_img, flipped_bboxes, aug_type='hflip')
+    check_results(flipped_img, flipped_bboxes, aug_type="hflip")
 
     # check resize
     resized_image, resized_boxes = resize(img, gt_boxes, size=[640, 640])
     display_results(img, gt_boxes, resized_image, resized_boxes)
-    check_results(resized_image, resized_boxes, aug_type='resize')
+    check_results(resized_image, resized_boxes, aug_type="resize")
 
     # check random crop
-    cropped_image, cropped_boxes, cropped_classes = random_crop(img, gt_boxes, gt_classes, [512, 512], min_area=100)
+    cropped_image, cropped_boxes, cropped_classes = random_crop(
+        img, gt_boxes, gt_classes, [512, 512], min_area=100
+    )
     display_results(img, gt_boxes, cropped_image, cropped_boxes)
-    check_results(cropped_image, cropped_boxes, aug_type='random_crop', classes=cropped_classes)
+    check_results(
+        cropped_image, cropped_boxes, aug_type="random_crop", classes=cropped_classes
+    )
+
+
+
