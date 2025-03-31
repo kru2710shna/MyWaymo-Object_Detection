@@ -12,3 +12,8 @@
 ```bash
 python convert.py -p /home/workspace/training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.
 ```
+
+## Train the model
+```bash
+python training.py --imdir GTSRB/Final_Training/Images/
+```
